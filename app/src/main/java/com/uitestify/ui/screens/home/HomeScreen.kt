@@ -31,6 +31,78 @@ fun HomeScreen(navController: NavController) {
 
     val listItems = (1..10).map { "Item $it" }
 
+    data class TestFeature(
+        val title: String,
+        val description: String,
+        val route: String
+    )
+
+    val featureList = listOf(
+        TestFeature("Form Validation", "Test field validation logic", "form"),
+        TestFeature("List Swipe", "Swipe actions on items", "list"),
+        TestFeature("Dialogs", "Alert and bottom sheet dialogs", "dialogs"),
+        TestFeature("Async Flow", "Progress, error & success states", "async"),
+        TestFeature("Accessibility", "Screen reader, talkback", "accessibility"),
+        TestFeature("Localization", "Multi-language support", "localization"),
+        TestFeature("Network State", "Offline / online behaviors", "network"),
+        TestFeature("Dark Mode", "Theming and contrast", "darkmode"),
+        TestFeature("Notifications", "Toast, snackbar, system notif", "notification"),
+        TestFeature("File Upload", "Picker & upload handling", "fileupload"),
+        TestFeature("Crash Test", "Simulate app crash safely", "crash"),
+        TestFeature("Update Prompt", "App version alert UX", "update"),
+        TestFeature("System Events", "Back/foreground/resume test", "system"),
+        TestFeature("Deep Link Test", "External intent testing", "deeplink"),
+        TestFeature("UI Playground", "All-in-one interaction zone", "playground")
+    )
+
+
+    Button(onClick = { navController.navigate("form") }) {
+        Text("Form Validation")
+    }
+    Button(onClick = { navController.navigate("list") }) {
+        Text("List Swipe")
+    }
+    Button(onClick = { navController.navigate("dialogs") }) {
+        Text("Dialogs")
+    }
+    Button(onClick = { navController.navigate("async") }) {
+        Text("Async Flow")
+    }
+    Button(onClick = { navController.navigate("accessibility") }) {
+        Text("Accessibility")
+    }
+    Button(onClick = { navController.navigate("localization") }) {
+        Text("Localization")
+    }
+    Button(onClick = { navController.navigate("network") }) {
+        Text("Network State")
+    }
+    Button(onClick = { navController.navigate("darkmode") }) {
+        Text("Dark Mode")
+        }
+    Button(onClick = { navController.navigate("notification") }) {
+        Text("Notifications")
+    }
+    Button(onClick = { navController.navigate("fileupload") }) {
+        Text("File Upload")
+    }
+    Button(onClick = { navController.navigate("crash") }) {
+        Text("Crash Test")
+        }
+    Button(onClick = { navController.navigate("update") }) {
+        Text("Update Prompt")
+    }
+    Button(onClick = { navController.navigate("system") }) {
+
+        Text("System Events")}
+    Button(onClick = { navController.navigate("deeplink") }) {
+        Text("Deep Link Test")
+    }
+    Button(onClick = { navController.navigate("playground") }) {
+        Text("UI Playground")
+
+    }
+
     GradientScaffold(
         topBar = { UiTestifyTopBar(title = "UiTestify") },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -126,45 +198,51 @@ fun HomeScreen(navController: NavController) {
                 Text("Open Dialog")
             }
 
-            Text("List of Items:")
+            Text("Available Test Scenarios:")
 
             LazyColumn(
-                modifier = Modifier.fillMaxHeight(0.4f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier
+                    .fillMaxHeight(0.4f)
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                items(listItems) { item ->
+                items(featureList) { feature ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { }
+                            .clickable { navController.navigate(feature.route) }
                             .padding(4.dp)
-                            .testTag("list_item_$item")
+                            .testTag("feature_card_${feature.route}")
                     ) {
-                        Text(
-                            text = item,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = feature.title, style = MaterialTheme.typography.titleMedium)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = feature.description,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text("Confirm Action") },
-                text = { Text("Are you sure you want to proceed?") },
-                confirmButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("Yes")
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Confirm Action") },
+                    text = { Text("Are you sure you want to proceed?") },
+                    confirmButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("Yes")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("No")
+                        }
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("No")
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }
