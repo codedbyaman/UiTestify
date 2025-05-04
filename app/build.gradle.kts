@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(platform(libs.androidx.compose.bom.v20240100))
     implementation(libs.material)
-
+    implementation("androidx.appcompat:appcompat:1.6.1")
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">UiTestify</string>
+    <string name="home_title">Home</string>
+    <string name="form_title">Form Validation</string>
+    <string name="list_title">List Swipe</string>
+    <string name="dialogs_title">Dialogs</string>
+    <string name="async_title">Async Flow</string>
+    <string name="accessibility_title">Accessibility</string>
+    <string name="localization_title">Localization</string>
+    <string name="splash_title">Splash Screen</string>
+    <string name="splash_logo_description">UiTestify Logo</string>
+
+    <string name="current_language">Current Language</string>
+    <string name="switch_to_english">Switch to English</string>
+    <string name="switch_to_hindi">Switch to Hindi</string>
+    <string name="switch_to_spanish">Switch to Spanish</string>
+
+
 </resources>
+
