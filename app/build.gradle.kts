@@ -55,7 +55,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
 
-
     // Material 3
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.text)
@@ -65,6 +64,9 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom.v20240100))
     implementation(libs.material)
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

@@ -20,25 +20,29 @@ import com.uitestify.ui.screens.form.FormValidationScreen
 import com.uitestify.ui.screens.home.HomeScreen
 import com.uitestify.ui.screens.list.ListSwipeScreen
 import com.uitestify.ui.screens.localization.LocalizationScreen
+import com.uitestify.ui.screens.login.LoginScreen
 import com.uitestify.ui.screens.network.NetworkStateScreen
 import com.uitestify.ui.screens.notification.NotificationScreen
 import com.uitestify.ui.screens.playground.UiPlaygroundScreen
 import com.uitestify.ui.screens.splash.SplashScreen
 import com.uitestify.ui.screens.system.SystemEventsScreen
 import com.uitestify.ui.screens.update.UpdatePromptScreen
+import com.uitestify.ui.viewmodel.ThemeViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController = rememberNavController()) {
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    themeViewModel: ThemeViewModel
+) {
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
-        composable("home") { HomeScreen(navController) }
+        composable("home") { HomeScreen(navController, themeViewModel) }
         composable("form") { FormValidationScreen(navController) }
         composable("list") { ListSwipeScreen(navController) }
         composable("dialogs") { DialogsScreen(navController) }
         composable("async") { AsyncFlowScreen(navController) }
         composable("accessibility") { AccessibilityScreen(navController) }
         composable("localization") { LocalizationScreen(navController) }
-        composable("splash") { SplashScreen(navController) }
         composable("network") { NetworkStateScreen(navController) }
         composable("darkmode") { DarkModeScreen(navController) }
         composable("notification") { NotificationScreen(navController) }
@@ -48,7 +52,7 @@ fun NavGraph(navController: NavHostController = rememberNavController()) {
         composable("system") { SystemEventsScreen(navController) }
         composable("deeplink") { DeepLinkTestScreen(navController) }
         composable("playground") { UiPlaygroundScreen(navController) }
-
+        composable("login") { LoginScreen(navController) }
 
         composable(
             route = "details/{id}",

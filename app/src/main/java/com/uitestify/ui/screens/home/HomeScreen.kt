@@ -1,41 +1,66 @@
 package com.uitestify.ui.screens.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.uitestify.ui.components.UiTestifyTopBar
 import com.uitestify.ui.theme.GradientScaffold
-import kotlinx.coroutines.launch
+import com.uitestify.ui.viewmodel.ThemeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class TestFeature(
+    val title: String,
+    val description: String,
+    val route: String
+)
+
 @Composable
-fun HomeScreen(navController: NavController) {
-
+fun HomeScreen(
+    navController: NavController,
+    themeViewModel: ThemeViewModel
+) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+    rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
-    var dropdownExpanded by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf("Select Option") }
-    var checkboxState by remember { mutableStateOf(false) }
-    var switchState by remember { mutableStateOf(true) }
-    var showDialog by remember { mutableStateOf(false) }
-
-    val listItems = (1..10).map { "Item $it" }
-
-    data class TestFeature(
-        val title: String,
-        val description: String,
-        val route: String
-    )
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var isProfileTapped by remember { mutableStateOf(false) }
 
     val featureList = listOf(
         TestFeature("Form Validation", "Test field validation logic", "form"),
@@ -55,155 +80,104 @@ fun HomeScreen(navController: NavController) {
         TestFeature("UI Playground", "All-in-one interaction zone", "playground")
     )
 
-
-    Button(onClick = { navController.navigate("form") }) {
-        Text("Form Validation")
-    }
-    Button(onClick = { navController.navigate("list") }) {
-        Text("List Swipe")
-    }
-    Button(onClick = { navController.navigate("dialogs") }) {
-        Text("Dialogs")
-    }
-    Button(onClick = { navController.navigate("async") }) {
-        Text("Async Flow")
-    }
-    Button(onClick = { navController.navigate("accessibility") }) {
-        Text("Accessibility")
-    }
-    Button(onClick = { navController.navigate("localization") }) {
-        Text("Localization")
-    }
-    Button(onClick = { navController.navigate("network") }) {
-        Text("Network State")
-    }
-    Button(onClick = { navController.navigate("darkmode") }) {
-        Text("Dark Mode")
-        }
-    Button(onClick = { navController.navigate("notification") }) {
-        Text("Notifications")
-    }
-    Button(onClick = { navController.navigate("fileupload") }) {
-        Text("File Upload")
-    }
-    Button(onClick = { navController.navigate("crash") }) {
-        Text("Crash Test")
-        }
-    Button(onClick = { navController.navigate("update") }) {
-        Text("Update Prompt")
-    }
-    Button(onClick = { navController.navigate("system") }) {
-
-        Text("System Events")}
-    Button(onClick = { navController.navigate("deeplink") }) {
-        Text("Deep Link Test")
-    }
-    Button(onClick = { navController.navigate("playground") }) {
-        Text("UI Playground")
-
-    }
-
     GradientScaffold(
         topBar = { UiTestifyTopBar(title = "UiTestify") },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .padding(16.dp)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .fillMaxSize()
         ) {
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
+            // Row: Avatar + Login Form
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("textfield_email")
-            )
-
-            ExposedDropdownMenuBox(
-                expanded = dropdownExpanded,
-                onExpandedChange = { dropdownExpanded = !dropdownExpanded }
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
-                    value = selectedItem,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Options") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) },
+                // Avatar Card
+                Card(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor()
-                        .testTag("dropdown_menu")
-                )
-                ExposedDropdownMenu(
-                    expanded = dropdownExpanded,
-                    onDismissRequest = { dropdownExpanded = false }
+                        .size(100.dp)
+                        .clickable { isProfileTapped = !isProfileTapped }
+                        .testTag("card_avatar"),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    listOf("Option A", "Option B", "Option C").forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                selectedItem = option
-                                dropdownExpanded = false
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        if (isProfileTapped) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("👨‍💻", style = MaterialTheme.typography.headlineSmall)
+                                Text("Aman Kumar", style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    "codedbyaman@example.com",
+                                    style = MaterialTheme.typography.bodySmall
+                                )
                             }
-                        )
+                        } else {
+                            Text("👤", style = MaterialTheme.typography.headlineSmall)
+                        }
+                    }
+                }
+
+                // Login Form
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("inline_input_email")
+                    )
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val icon =
+                                if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(icon, contentDescription = "Toggle password")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("inline_input_password")
+                    )
+
+                    Button(
+                        onClick = { navController.navigate("login") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("inline_btn_login")
+                    ) {
+                        Text("Login")
                     }
                 }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = checkboxState,
-                    onCheckedChange = { checkboxState = it },
-                    modifier = Modifier.testTag("checkbox_agree")
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Agree to terms")
-            }
+            // Header
+            Text(
+                "Available Test Scenarios:",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp)
+            )
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(
-                    checked = switchState,
-                    onCheckedChange = { switchState = it },
-                    modifier = Modifier.testTag("switch_toggle")
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Enable feature")
-            }
-
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Button clicked")
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("button_submit")
-            ) {
-                Text("Show Snackbar")
-            }
-
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("button_dialog")
-            ) {
-                Text("Open Dialog")
-            }
-
-            Text("Available Test Scenarios:")
-
+            // Feature List
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxHeight(0.4f)
-                    .padding(top = 8.dp),
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 items(featureList) { feature ->
@@ -211,7 +185,6 @@ fun HomeScreen(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { navController.navigate(feature.route) }
-                            .padding(4.dp)
                             .testTag("feature_card_${feature.route}")
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -224,24 +197,6 @@ fun HomeScreen(navController: NavController) {
                         }
                     }
                 }
-            }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Confirm Action") },
-                    text = { Text("Are you sure you want to proceed?") },
-                    confirmButton = {
-                        TextButton(onClick = { showDialog = false }) {
-                            Text("Yes")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDialog = false }) {
-                            Text("No")
-                        }
-                    }
-                )
             }
         }
     }

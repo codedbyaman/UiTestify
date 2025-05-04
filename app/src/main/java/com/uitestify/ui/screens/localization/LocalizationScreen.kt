@@ -1,15 +1,14 @@
 package com.uitestify.ui.screens.localization
 
-import android.app.Activity
-import android.content.res.Configuration
-import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
@@ -17,13 +16,14 @@ import androidx.navigation.NavController
 import com.uitestify.R
 import com.uitestify.ui.components.UiTestifyTopBar
 import com.uitestify.ui.theme.GradientScaffold
-import java.util.*
+import java.util.Locale
 
 @Composable
 fun LocalizationScreen(navController: NavController) {
     val context = LocalContext.current
 
-    fun setLocale(locale: Locale) {val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(locale.toLanguageTag())
+    fun setLocale(locale: Locale) {
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(locale.toLanguageTag())
         AppCompatDelegate.setApplicationLocales(appLocale)
     }
 
