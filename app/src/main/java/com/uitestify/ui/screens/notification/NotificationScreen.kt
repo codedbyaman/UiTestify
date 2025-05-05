@@ -1,26 +1,14 @@
 package com.uitestify.ui.screens.notification
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.uitestify.ui.components.UiTestifyTopBar
@@ -35,51 +23,93 @@ fun NotificationScreen(navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
 
     GradientScaffold(
-        topBar = { UiTestifyTopBar("Notifications") },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        topBar = { UiTestifyTopBar("Notification Showcase") },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(24.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("This is a Snackbar")
-                    }
-                },
-                modifier = Modifier.testTag("btn_snackbar")
-            ) {
-                Text("Show Snackbar")
+            Text(
+                text = "UI Notifications",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.testTag("title_notifications")
+            )
+
+            // Snackbar button
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("📩 Snackbar", style = MaterialTheme.typography.labelLarge)
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("✅ Snackbar shown successfully")
+                        }
+                    },
+                    modifier = Modifier.testTag("btn_snackbar")
+                ) {
+                    Text("Show Snackbar")
+                }
             }
 
-            Button(
-                onClick = {
-                    Toast.makeText(context, "This is a Toast", Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier.testTag("btn_toast")
-            ) {
-                Text("Show Toast")
+            // Toast button
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("📢 Toast", style = MaterialTheme.typography.labelLarge)
+                Button(
+                    onClick = {
+                        Toast.makeText(context, "🔔 This is a Toast", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.testTag("btn_toast")
+                ) {
+                    Text("Show Toast")
+                }
             }
 
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier.testTag("btn_alertdialog")
-            ) {
-                Text("Show Alert Dialog")
+            // AlertDialog button
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("⚠️ Alert Dialog", style = MaterialTheme.typography.labelLarge)
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier.testTag("btn_alertdialog")
+                ) {
+                    Text("Show Dialog")
+                }
+            }
+
+            // Simulate System Notification (Mock only)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("🔔 System Notification", style = MaterialTheme.typography.labelLarge)
+                Button(
+                    onClick = {
+                        Toast.makeText(
+                            context,
+                            "Simulating system notification...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    modifier = Modifier.testTag("btn_mock_notification")
+                ) {
+                    Text("Mock Notification")
+                }
             }
 
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
-                    title = { Text("Confirmation") },
-                    text = { Text("Are you sure you want to proceed?") },
+                    title = { Text("Confirmation Required") },
+                    text = { Text("Are you sure you want to proceed with this action?") },
                     confirmButton = {
-                        TextButton(onClick = { showDialog = false }) {
+                        TextButton(
+                            onClick = {
+                                showDialog = false
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("✅ Confirmed")
+                                }
+                            }
+                        ) {
                             Text("Yes")
                         }
                     },

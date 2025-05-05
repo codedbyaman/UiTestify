@@ -5,7 +5,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,14 +39,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.uitestify.ui.components.UiTestifyTopBar
 import com.uitestify.ui.theme.GradientScaffold
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -52,9 +57,12 @@ fun UiPlaygroundScreen(navController: NavController) {
     var sliderValue by remember { mutableFloatStateOf(0.5f) }
     var isSwitchOn by remember { mutableStateOf(true) }
     var animatedSize by remember { mutableStateOf(100.dp) }
-    var longPressed by remember { mutableStateOf(false) }
+    var longPressStatus by remember { mutableStateOf("Hold Me") }
     var swipeText by remember { mutableStateOf("Swipe left or right") }
-    var zoom by remember { mutableFloatStateOf(1f) }
+    var doubleTapStatus by remember { mutableStateOf("Double tap here") }
+    var offsetX by remember { mutableStateOf(0f) }
+    var offsetY by remember { mutableStateOf(0f) }
+    var pinchZoom by remember { mutableStateOf(1f) }
 
     GradientScaffold(
         topBar = { UiTestifyTopBar("UI Playground") }
@@ -67,10 +75,9 @@ fun UiPlaygroundScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Counter Section
-            SectionCard(title = "Counter Interaction") {
+            SectionCard("Counter Interaction") {
                 Text(
-                    text = "UI State: $counter",
+                    "UI State: $counter",
                     fontSize = 20.sp,
                     modifier = Modifier.testTag("txt_counter")
                 )
@@ -84,8 +91,7 @@ fun UiPlaygroundScreen(navController: NavController) {
                 }
             }
 
-            // Switch Section
-            SectionCard(title = "Toggle Feature") {
+            SectionCard("Toggle Feature") {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -100,10 +106,9 @@ fun UiPlaygroundScreen(navController: NavController) {
                 }
             }
 
-            // Slider Section
-            SectionCard(title = "Slider Control") {
+            SectionCard("Slider Control") {
                 Text(
-                    text = "Value: ${(sliderValue * 100).toInt()}%",
+                    "Value: ${(sliderValue * 100).toInt()}%",
                     modifier = Modifier.testTag("txt_slider_val")
                 )
                 Slider(
@@ -115,8 +120,7 @@ fun UiPlaygroundScreen(navController: NavController) {
                 )
             }
 
-            // Expandable Section
-            SectionCard(title = "Expandable Card") {
+            SectionCard("Expandable Card") {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -126,28 +130,21 @@ fun UiPlaygroundScreen(navController: NavController) {
                     shape = RoundedCornerShape(8.dp),
                     tonalElevation = 2.dp
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(Modifier.padding(16.dp)) {
                         Text("Tap to ${if (isExpanded) "collapse" else "expand"}")
                         if (isExpanded) {
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                "Expanded content shown here.",
-                                modifier = Modifier.testTag("txt_expanded")
-                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text("Expanded content shown here.", Modifier.testTag("txt_expanded"))
                         }
                     }
                 }
             }
 
-            // Animated Box on Tap
-            SectionCard(title = "Tap Animation") {
+            SectionCard("Tap Animation") {
                 Box(
                     modifier = Modifier
                         .size(animatedSize)
-                        .background(
-                            MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                         .clickable {
                             animatedSize = if (animatedSize == 100.dp) 160.dp else 100.dp
                         }
@@ -157,30 +154,24 @@ fun UiPlaygroundScreen(navController: NavController) {
                 Text("Tap box to grow/shrink", fontSize = 12.sp)
             }
 
-            // Long Press Gesture
-            SectionCard(title = "Long Press Gesture") {
+            SectionCard("Long Press Gesture") {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp)
                         .combinedClickable(
                             onClick = {},
-                            onLongClick = { longPressed = !longPressed }
-                        )
+                            onLongClick = { longPressStatus = "✅ Long Pressed" })
                         .testTag("long_press_target"),
                     tonalElevation = 2.dp
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            if (longPressed) "✅ Long Pressed" else "Hold Me",
-                            modifier = Modifier.testTag("txt_long_press_status")
-                        )
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(longPressStatus, Modifier.testTag("txt_long_press_status"))
                     }
                 }
             }
 
-            // Horizontal Swipe Detection
-            SectionCard(title = "Swipe Detector") {
+            SectionCard("Swipe Detector") {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -198,32 +189,66 @@ fun UiPlaygroundScreen(navController: NavController) {
                         .testTag("swipe_box"),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(swipeText, modifier = Modifier.testTag("txt_swipe_status"))
+                    Text(swipeText, Modifier.testTag("txt_swipe_status"))
                 }
             }
 
-            // Zoom In/Out Box
-            SectionCard(title = "Zoom (Scale)") {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(onClick = { zoom *= 1.2f }, modifier = Modifier.testTag("btn_zoom_in")) {
-                        Text("Zoom In")
-                    }
-                    Button(
-                        onClick = { zoom *= 0.8f },
-                        modifier = Modifier.testTag("btn_zoom_out")
-                    ) {
-                        Text("Zoom Out")
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
+            SectionCard("Double Tap Detection") {
                 Box(
                     modifier = Modifier
-                        .size((100 * zoom).dp)
-                        .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(10.dp))
-                        .testTag("box_zoom_target")
-                )
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onDoubleTap = {
+                                doubleTapStatus = "✅ Double Tapped!"
+                            })
+                        }
+                        .background(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            RoundedCornerShape(8.dp)
+                        )
+                        .testTag("double_tap_box"),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(doubleTapStatus, Modifier.testTag("txt_double_tap_status"))
+                }
+            }
+
+            SectionCard("Drag Gesture") {
+                Box(
+                    modifier = Modifier
+                        .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                        .size(80.dp)
+                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                        .pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consume()
+                                offsetX += dragAmount.x
+                                offsetY += dragAmount.y
+                            }
+                        }
+                        .testTag("box_drag_target"),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Drag", color = MaterialTheme.colorScheme.onPrimary)
+                }
+            }
+
+            SectionCard("Pinch Zoom Gesture") {
+                Box(
+                    modifier = Modifier
+                        .size((100 * pinchZoom).dp)
+                        .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp))
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, _, zoomChange, _ ->
+                                pinchZoom *= zoomChange
+                            }
+                        }
+                        .testTag("pinch_zoom_box"),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Pinch Me", color = MaterialTheme.colorScheme.onTertiary)
+                }
             }
         }
     }
@@ -238,7 +263,7 @@ private fun SectionCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(2.dp, RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(

@@ -1,19 +1,9 @@
 package com.uitestify.ui.screens.deeplink
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -21,15 +11,34 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.uitestify.ui.components.UiTestifyTopBar
 import com.uitestify.ui.theme.GradientScaffold
-
+import kotlinx.coroutines.launch
 
 @Composable
 fun DeepLinkTestScreen(navController: NavController) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     var simulatedUri by remember { mutableStateOf<Uri?>(null) }
     var extractedParams by remember { mutableStateOf("") }
 
+    fun simulateUri(uriString: String) {
+        val uri = Uri.parse(uriString)
+        simulatedUri = uri
+        val id = uri.getQueryParameter("id")
+        val source = uri.getQueryParameter("source")
+        extractedParams = buildString {
+            appendLine("• id: ${id ?: "null"}")
+            appendLine("• source: ${source ?: "null"}")
+        }
+
+        coroutineScope.launch {
+            snackbarHostState.showSnackbar("Deep link simulated.")
+        }
+    }
+
     GradientScaffold(
-        topBar = { UiTestifyTopBar("Deep Link Test") }
+        topBar = { UiTestifyTopBar("Deep Link Test") },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -39,31 +48,60 @@ fun DeepLinkTestScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text("Simulate a deep link with query parameters:")
+
             Button(
                 onClick = {
-                    val uri = Uri.parse("uitestify://open/details?id=42&source=test")
-                    simulatedUri = uri
-
-                    val id = uri.getQueryParameter("id")
-                    val source = uri.getQueryParameter("source")
-                    extractedParams = "id=$id\nsource=$source"
+                    simulateUri("uitestify://open/details?id=42&source=test")
                 },
-                modifier = Modifier.testTag("btn_simulate_deeplink")
+                modifier = Modifier.testTag("btn_simulate_deeplink_42")
             ) {
-                Text("Simulate Deep Link")
+                Text("Simulate ID = 42")
             }
 
+            Button(
+                onClick = {
+                    simulateUri("uitestify://open/details?id=100&source=notification")
+                },
+                modifier = Modifier.testTag("btn_simulate_deeplink_100")
+            ) {
+                Text("Simulate ID = 100")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    simulatedUri = null
+                    extractedParams = ""
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Deep link reset.")
+                    }
+                },
+                modifier = Modifier.testTag("btn_reset_deeplink")
+            ) {
+                Text("Reset")
+            }
+
+            Divider()
+
             Text(
-                text = simulatedUri?.toString() ?: "No deep link received yet.",
+                text = "URI:",
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            Text(
+                text = simulatedUri?.toString() ?: "No deep link simulated yet.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.testTag("txt_deeplink_uri")
             )
 
-            if (extractedParams.isNotEmpty()) {
+            if (extractedParams.isNotBlank()) {
                 Divider()
-
                 Text(
-                    text = "Extracted Params:\n$extractedParams",
+                    text = "Extracted Params:",
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = extractedParams,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.testTag("txt_deeplink_params")
                 )
