@@ -2,6 +2,9 @@
 
 🚀 A comprehensive Android app built in Kotlin for writing and practicing UI test cases using Jetpack Compose, Espresso, and accessibility tools.
 
+<img src="https://github.com/user-attachments/assets/363bc2c8-d0d2-48da-8031-ac8941b6cf33" width="200" height="400" alt="uitestify"/>
+    </td>
+
 ## ✨ Features
 
 - Jetpack Compose UI components
