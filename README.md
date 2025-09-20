@@ -47,3 +47,36 @@
    ```bash
    git clone https://github.com/<your-username>/uiTestify.git
    cd uiTestify
+
+## 🚀 APK for Testing
+
+The latest APK build is available here for quick access.
+Simply download & install on your Android device or emulator to begin testing instantly — no extra setup needed.
+
+✨ Features:
+
+⚡ One-click install
+
+📱 Compatible with both devices & emulators
+
+🔍 Ready-to-test out of the box
+
+***📥 How to Install***
+
+**🔹 On Android Device**
+
+Download the APK from this repo.
+
+Transfer it to your phone (if downloaded on PC).
+
+Enable Install from Unknown Sources in your phone settings.
+
+Tap the APK and install.
+
+**🔹 On Emulator (via ADB)**
+
+Ensure your emulator is running.
+
+**Run the command: adb install your-app.apk**
+
+The app will be available in the emulator’s app drawer.
